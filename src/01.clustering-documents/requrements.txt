@@ -8,3 +8,4 @@ python-dotenv==1.2.1
 scikit-learn==1.7.2
 matplotlib==3.10.7
 kneed==0.8.5
+hdbscan==0.8.40
