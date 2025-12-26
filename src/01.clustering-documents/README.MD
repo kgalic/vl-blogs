@@ -6,7 +6,15 @@ The data comes from [Philips official technical documentation](https://www.light
 
 ## Overview
 
-This project explores different approaches to clustering PDF documents using embeddings and various clustering algorithms. The workflow consists of four main notebooks, each implementing a different strategy for document analysis and clustering.
+This project explores different approaches to clustering PDF documents using embeddings and various clustering algorithms. The workflow consists of 12 notebooks, each implementing a different strategy for document analysis and clustering:
+
+- **Notebooks 2-7**: K-Means and HDBSCAN with various document vector methods
+- **Notebooks 8-11**: Hierarchical clustering with different aggregation strategies  
+- **Notebook 12**: HDBSCAN with attention pooling
+
+The approaches vary along two dimensions:
+1. **Document vector computation**: Weighted mean, geometric median, PCA direction, attention pooling
+2. **Clustering algorithm**: K-Means (with Elbow/Silhouette), Hierarchical (Ward linkage), HDBSCAN (density-based)
 
 ---
 
@@ -298,6 +306,181 @@ Cluster documents using K-Means with Elbow Method, but with an **attention-based
 
 ---
 
+## Notebook 8: Hierarchical with Weighted Mean (`08.clustering-approach-07.ipynb`)
+
+### Purpose
+Cluster documents using **Hierarchical Agglomerative Clustering** with weighted mean document vectors and dendrogram visualization for optimal cluster selection.
+
+### Process
+
+1. **Document Vector Computation**: 
+   - Uses weighted mean approach (same as Notebook 2)
+   - Aggregates page embeddings uniformly
+
+2. **Dendrogram Analysis**: 
+   - Creates hierarchical clustering dendrogram using Ward's linkage
+   - Visualizes document relationships as a tree structure
+   - Manually select optimal number of clusters by observing dendrogram structure
+
+3. **Hierarchical Clustering**:
+   - Uses `AgglomerativeClustering` with Ward linkage
+   - Ward's method minimizes within-cluster variance
+   - Bottom-up approach: starts with each document as a cluster, merges most similar pairs
+   
+   - **Advantages over K-Means**:
+     - Reveals hierarchical structure
+     - More intuitive visualization via dendrogram
+     - Deterministic (no random initialization)
+     - Better for elongated/non-spherical clusters
+
+4. **Visualization**: 
+   - PCA 2D visualization showing cluster assignments
+   - Displays variance explained by principal components
+
+5. **Organization**: 
+   - Copies documents into `data_output/clusters-07/` folders
+
+### Output
+- Documents organized into `data_output/clusters-07/cluster{N}/` folders
+- Dendrogram visualization for cluster structure understanding
+
+---
+
+## Notebook 9: Hierarchical with Geometric Median (`09.clustering-approach-08.ipynb`)
+
+### Purpose
+Combine hierarchical clustering with robust **geometric median** document vector computation.
+
+### Process
+
+1. **Document Vector Computation**: 
+   - Uses geometric median (same as Notebook 5)
+   - Iterative algorithm minimizing sum of distances to page vectors
+   - More robust to outlier pages
+
+2. **Dendrogram Analysis**: 
+   - Creates hierarchical clustering dendrogram using Ward's linkage
+   - Select optimal clusters by visual inspection
+
+3. **Hierarchical Clustering**:
+   - `AgglomerativeClustering` with Ward linkage
+   - Bottom-up merging strategy
+
+4. **Visualization**: 
+   - PCA 2D scatter plot with cluster coloring
+
+5. **Organization**: 
+   - Copies documents into `data_output/clusters-08/` folders
+
+### Output
+- Documents organized into `data_output/clusters-08/cluster{N}/` folders
+- Robust clustering with hierarchical structure
+
+---
+
+## Notebook 10: Hierarchical with PCA Direction (`10.clustering-approach-09.ipynb`)
+
+### Purpose
+Apply hierarchical clustering to documents represented by their **PCA principal direction**.
+
+### Process
+
+1. **Document Vector Computation**: 
+   - Uses PCA direction (same as Notebook 6)
+   - First principal component represents main thematic direction
+
+2. **Dendrogram Analysis**: 
+   - Creates dendrogram using Ward's linkage
+   - Visual inspection for optimal cluster count
+
+3. **Hierarchical Clustering**:
+   - `AgglomerativeClustering` with Ward linkage
+
+4. **Visualization**: 
+   - PCA visualization with cluster assignments
+
+5. **Organization**: 
+   - Copies documents into `data_output/clusters-09/` folders
+
+### Output
+- Documents organized into `data_output/clusters-09/cluster{N}/` folders
+- Theme-based hierarchical clustering
+
+---
+
+## Notebook 11: Hierarchical with Attention Pooling (`11.clustering-approach-10.ipynb`)
+
+### Purpose
+Combine hierarchical clustering with **attention-based pooling** for document vector computation.
+
+### Process
+
+1. **Document Vector Computation**: 
+   - Uses attention pooling (same as Notebook 7)
+   - Iterative refinement giving higher weight to central pages
+   - Parameters: α=5.0, iterations=3
+
+2. **Dendrogram Analysis**: 
+   - Creates hierarchical clustering dendrogram
+   - Ward's linkage for variance minimization
+
+3. **Hierarchical Clustering**:
+   - `AgglomerativeClustering` with Ward linkage
+   - Bottom-up hierarchical approach
+
+4. **Visualization**: 
+   - PCA 2D visualization with cluster colors
+
+5. **Organization**: 
+   - Copies documents into `data_output/clusters-10/` folders
+
+### Output
+- Documents organized into `data_output/clusters-10/cluster{N}/` folders
+- Attention-focused hierarchical clustering
+
+---
+
+## Notebook 12: HDBSCAN with Attention Pooling (`12.clustering-approach-11.ipynb`)
+
+### Purpose
+Combine density-based **HDBSCAN clustering** with attention-pooled document vectors for automatic cluster discovery.
+
+### Process
+
+1. **Document Vector Computation**: 
+   - Uses attention pooling (same as Notebook 7)
+   - Iteratively weights pages by similarity to center
+   - Parameters: α=5.0, iterations=3
+
+2. **HDBSCAN Clustering**:
+   - Density-based clustering with automatic cluster number detection
+   - Parameters:
+     - `min_cluster_size=3`: Smaller than Notebook 3 for finer granularity
+     - `min_samples=10`: Controls density threshold
+     - `metric='euclidean'`: Distance metric
+   
+   - **Key advantages**:
+     - No need to specify number of clusters
+     - Identifies noise/outlier documents (cluster -1)
+     - Finds natural density-based groupings
+     - Variable cluster sizes
+
+3. **Visualization**: 
+   - PCA 2D scatter plot with cluster colors
+   - Color bar showing cluster assignments
+   - Outliers shown in distinct color
+
+4. **Organization**: 
+   - Copies documents into `data_output/clusters-11/` folders
+   - Variable number of folders based on discovered clusters
+
+### Output
+- Documents organized into `data_output/clusters-11/cluster{N}/` folders
+- Automatic cluster discovery with attention-focused vectors
+- Potential identification of outlier documents
+
+---
+
 ## Comparison of Approaches
 
 | Method | Notebook | Algorithm | Cluster Detection | Document Vector Method | Pros | Cons |
@@ -308,6 +491,11 @@ Cluster documents using K-Means with Elbow Method, but with an **attention-based
 | **Geometric Median + Elbow** | 05 | K-Means | Inertia curve | Geometric median | Robust to outliers | More computation per doc vector |
 | **PCA Direction + Elbow** | 06 | K-Means | Inertia curve | First principal component | Captures main theme direction | May lose nuanced content |
 | **Attention Pool + Elbow** | 07 | K-Means | Inertia curve | Iterative attention weighting | Self-attentive, focus on core | Requires hyperparameter (α) |
+| **Weighted Mean + Hierarchical** | 08 | Agglomerative | Dendrogram | Weighted mean (uniform weights) | Deterministic, hierarchical structure | Manual cluster selection |
+| **Geometric Median + Hierarchical** | 09 | Agglomerative | Dendrogram | Geometric median | Robust + hierarchical | Manual cluster selection |
+| **PCA Direction + Hierarchical** | 10 | Agglomerative | Dendrogram | First principal component | Theme-based + hierarchical | May lose nuance |
+| **Attention Pool + Hierarchical** | 11 | Agglomerative | Dendrogram | Iterative attention weighting | Focus on core + hierarchical | Requires hyperparameters |
+| **Attention Pool + HDBSCAN** | 12 | Density-based | Automatic | Iterative attention weighting | Auto-discovery + attention focus | Sensitive to parameters |
 
 ---
 
