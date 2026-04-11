@@ -1,0 +1,10 @@
+openai==2.29.0
+python-dotenv==1.2.1
+azure-identity==1.25.1
+python-dotenv==1.2.1 
+llama-index==0.14.18
+llama-index-llms-ollama==0.10.1 
+llama-index-embeddings-huggingface==0.7.0
+faiss-cpu==1.13.2
+llama-index-vector-stores-faiss==0.6.0
+agent-framework==1.0.0rc5
